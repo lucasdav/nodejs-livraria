@@ -10,7 +10,7 @@ class LivroController {
     } catch (erro) {
       res.status(500).json({ message: `${erro.message} - falha na requisição` });
     }
-  };
+  }
 
   static async listarLivroPorId (req, res) {
     try {
@@ -20,7 +20,7 @@ class LivroController {
     } catch (erro) {
       res.status(500).json({ message: `${erro.message} - falha na requisição do livro` });
     }
-  };
+  }
 
   static async cadastrarLivro (req, res) {
     const novoLivro = req.body;
@@ -42,7 +42,7 @@ class LivroController {
     } catch (erro) {
       res.status(500).json({ message: `${erro.message} - falha na atualização` });
     }
-  };
+  }
 
   static async excluirLivro (req, res) {
     try {
@@ -52,17 +52,17 @@ class LivroController {
     } catch (erro) {
       res.status(500).json({ message: `${erro.message} - falha na exclusão` });
     }
-  };
+  }
 
   static async listarLivrosPorEditora (req, res) {
     const editora = req.query.editora;
     try {
       const livrosPorEditora = await livro.find({ editora: editora });
-      res.status(200).json(livrosPorEditora)
+      res.status(200).json(livrosPorEditora);
     } catch (erro) {
       res.status(500).json({ message: `${erro.message} - falha na busca` });
     }
-  };
-};
+  }
+}
 
 export default LivroController;
