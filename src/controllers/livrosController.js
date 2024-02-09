@@ -9,14 +9,25 @@ class LivroController {
       //para forçar um erro de servido utilizar throw new Error()
       //throw new Error();
 
-      // abaixo limite de linhas por páginas e paginação
-      let { limite = 5, pagina = 1 } = req.query;
+      // abaixo limite de linhas por páginas e paginação; e também ordenação
+      let { limite = 5, pagina = 1, ordenacao = "_id: -1" } = req.query;
+
+      //na requisicao postman: http://localhost:3000/livros?ordenacao=titulo:1
+      let [campoOrdenacao, ordem ] = ordenacao.split(":");
 
       limite = parseInt(limite);
       pagina = parseInt(pagina);
+      ordem = parseInt(ordem);
 
       if (limite > 0 && pagina > 0) {
         const livrosResultado = await livros.find()
+          // abaixo para ordenacao por mais recente
+          //.sort({ _id: -1 })
+          // abaixo para ordenacao por titulo
+          //.sort({ titulo: 1 })
+          //abaixo ordenacao por campo dinamico
+          .sort({ [campoOrdenacao]: ordem })
+          // abaixo para limite e paginacao
           .skip((pagina - 1) * limite)
           .limit(limite)
           .populate("autor")
