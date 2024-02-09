@@ -87,7 +87,8 @@ class LivroController {
       const busca = {};
 
       if (editora) busca.editora = editora;
-      if (titulo) busca.titulo = titulo;
+      //abaixo uso de regex para filtro sem diferenciar caracter maiusculo de minusculo
+      if (titulo) busca.titulo = { $regex: titulo, $options: "i" };
       
       const livrosResultado = await livros.find(busca);
 
