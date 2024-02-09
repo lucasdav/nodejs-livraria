@@ -1,42 +1,16 @@
 import { livros, autores } from "../models/index.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 
 class LivroController {
 
   static listarLivros = async (req, res, next) => {
     try {
-      //para forçar um erro de servido utilizar throw new Error()
-      //throw new Error();
+      const buscaLivros = livros.find();
 
-      // abaixo limite de linhas por páginas e paginação; e também ordenação
-      let { limite = 5, pagina = 1, ordenacao = "_id: -1" } = req.query;
+      req.resultado = buscaLivros;
 
-      //na requisicao postman: http://localhost:3000/livros?ordenacao=titulo:1
-      let [campoOrdenacao, ordem ] = ordenacao.split(":");
-
-      limite = parseInt(limite);
-      pagina = parseInt(pagina);
-      ordem = parseInt(ordem);
-
-      if (limite > 0 && pagina > 0) {
-        const livrosResultado = await livros.find()
-          // abaixo para ordenacao por mais recente
-          //.sort({ _id: -1 })
-          // abaixo para ordenacao por titulo
-          //.sort({ titulo: 1 })
-          //abaixo ordenacao por campo dinamico
-          .sort({ [campoOrdenacao]: ordem })
-          // abaixo para limite e paginacao
-          .skip((pagina - 1) * limite)
-          .limit(limite)
-          .populate("autor")
-          .exec();
-
-        res.status(200).json(livrosResultado);
-      } else {
-        next(new RequisicaoIncorreta());
-      }
+      //next sem parametros para executar o middleware de listagem com limite, paginacao e ordenacao
+      next();
 
     } catch (erro) {
       next(erro);
@@ -106,13 +80,22 @@ class LivroController {
   };
 
   static listarLivroPorFiltro = async (req, res, next) => {
+
+    //exemplo requisicao postman: http://localhost:3000/livros/busca?nomeAutor=Jose&ordenacao=titulo:1&paginacao=2
+
     try {
     
       const busca = await processaBusca(req.query);
 
       if (busca !== null) {
-        const livrosResultado = await livros.find(busca).populate("autor");
-        res.status(200).send(livrosResultado);
+        const livrosResultado = livros
+          .find(busca)
+          .populate("autor");
+
+        req.resultado = livrosResultado;
+
+        //abaixo usar next para excutar middleware paginar passado por parametros em livrosRoutes
+        next();
       } else {
         res.status(200).send([]);
       }      
